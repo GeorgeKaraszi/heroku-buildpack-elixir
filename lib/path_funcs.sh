@@ -7,7 +7,7 @@ function build_path() {
 }
 
 function platform_tools_path() {
-  echo "$(build_path)/.platform_tools"
+  echo "$(app_home_path)/.platform_tools"
 }
 
 function erlang_path() {

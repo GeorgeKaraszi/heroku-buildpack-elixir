@@ -36,6 +36,7 @@ clean_cache
 
 
 echo "Elixir path is $(elixir_path)"
+echo "Platform path is $(platform_tools_path)"
 
 
 
