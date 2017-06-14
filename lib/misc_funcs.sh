@@ -22,9 +22,11 @@ function output_section() {
 
 
 function load_config() {
-  output_section "Checking Erlang and Elixir versions"
+  output_section "Checking for buildpack configuration"
 
-  local custom_config_file="${build_path}/elixir_buildpack.config"
+  local custom_config_file="${build_root_path}/elixir_buildpack.config"
+
+  output_line $custom_config_file
 
   # Source for default versions file from buildpack first
   source "${build_pack_path}/elixir_buildpack.config"
@@ -36,25 +38,25 @@ function load_config() {
     output_line "WARNING: elixir_buildpack.config wasn't found in the app"
     output_line "Using default config from Elixir buildpack"
   fi
+}
 
+function print_config() {
+  output_section "Checking Erlang and Elixir versions"
   output_line "Will use the following versions:"
   output_line "* Stack ${STACK}"
   output_line "* Erlang ${erlang_version}"
   output_line "* Elixir ${elixir_version[0]} ${elixir_version[1]}"
 }
 
+# Make the config vars from config_vars_to_export available at slug compile time.
+# Useful for compiled languages like Erlang and Elixir
+function export_config_vars() {
+  for config_var in ${config_vars_to_export[@]}; do
+    if [ -d $env_path ] && [ -f $env_path/${config_var} ]; then
+      export ${config_var}=$(cat $env_path/${config_var})
+    fi
+  done
 
-function export_env_vars() {
-  whitelist_regex=${2:-''}
-  blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
-  if [ -d "$env_path" ]; then
-    output_section "Will export the following config vars:"
-    for e in $(ls $env_path); do
-      echo "$e" | grep -E "$whitelist_regex" | grep -vE "$blacklist_regex" &&
-      export "$e=$(cat $env_path/$e)"
-      :
-    done
-  fi
 }
 
 function export_mix_env() {
